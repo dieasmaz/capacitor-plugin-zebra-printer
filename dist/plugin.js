@@ -1,0 +1,129 @@
+var capacitorPlugin = (function (exports, core) {
+    'use strict';
+
+    var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+            function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
+    class ZebraCapacitorPluginWeb extends core.WebPlugin {
+        constructor() {
+            super({
+                name: 'ZebraCapacitorPlugin',
+                platforms: ['web'],
+            });
+            this.printers = [
+                {
+                    name: 'Test Printer 1',
+                    address: 'A1B2C3D4E5F607',
+                    manufacturer: 'TEST',
+                    modelNumber: 'TEST-1234',
+                    connected: false
+                },
+                {
+                    name: 'Test Printer 2',
+                    address: 'A1B2C3D4E5F608',
+                    manufacturer: 'TEST',
+                    modelNumber: 'TEST-1234',
+                    connected: false
+                }
+            ];
+            this.connectedPrinter = null;
+        }
+        echo(options) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log('ECHO', options);
+                return options;
+            });
+        }
+        discover() {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ZebraPluginWeb::discover");
+                return {
+                    printers: this.printers
+                };
+            });
+        }
+        printerStatus() {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ZebraPluginWeb::printerStatus");
+                return new Promise(resolve => setTimeout(() => {
+                    let status = {
+                        connected: false,
+                        isReadyToPrint: false,
+                        isPaused: false,
+                        isReceiveBufferFull: false,
+                        isRibbonOut: false,
+                        isPaperOut: false,
+                        isHeadTooHot: false,
+                        isHeadOpen: false,
+                        isHeadCold: false,
+                        isPartialFormatInProgress: false
+                    };
+                    if (this.connectedPrinter != null) {
+                        status.connected = true;
+                        status.isReadyToPrint = true;
+                    }
+                    resolve(status);
+                    return status;
+                }, 500));
+            });
+        }
+        print(options) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ZebraPluginWeb::print", options.cpcl);
+                return new Promise(resolve => setTimeout(() => {
+                    resolve(true);
+                }, 1000));
+            });
+        }
+        isConnected() {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ZebraPluginWeb::isConnected");
+                return this.connectedPrinter != null;
+            });
+        }
+        connect(options) {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ZebraPluginWeb::connect", options.MACAddress);
+                return new Promise(resolve => setTimeout(() => {
+                    const printer = this.printers.find(p => p.address == options.MACAddress);
+                    if (printer != null) {
+                        printer.connected = true;
+                        // if we were previously connected to a printer, mark it as not connected
+                        if (this.connectedPrinter) {
+                            this.connectedPrinter.connected = false;
+                        }
+                        // set our connectPrinter to this one
+                        this.connectedPrinter = printer;
+                        resolve(true);
+                        return true;
+                    }
+                    resolve(false);
+                    return false;
+                }, 1000));
+            });
+        }
+        disconnect() {
+            return __awaiter(this, void 0, void 0, function* () {
+                console.log("ZebraPluginWeb::disconnect");
+                return true;
+            });
+        }
+    }
+    const ZebraCapacitorPlugin = new ZebraCapacitorPluginWeb();
+    core.registerWebPlugin(ZebraCapacitorPlugin);
+
+    exports.ZebraCapacitorPlugin = ZebraCapacitorPlugin;
+    exports.ZebraCapacitorPluginWeb = ZebraCapacitorPluginWeb;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+
+    return exports;
+
+}({}, capacitorExports));
+//# sourceMappingURL=plugin.js.map
